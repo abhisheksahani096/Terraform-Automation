@@ -3,7 +3,7 @@ pipeline {
     parameters {
         choice(
             name: 'ACTION',
-            choices: ['plan', 'apply'],
+            choices: ['plan', 'apply', 'destroy'],
             description: 'Select the action to perform'
         )
         string(
@@ -22,13 +22,11 @@ pipeline {
                 )
             }
         }
-
         stage("terraform init") {
             steps {
                 sh("terraform init -reconfigure")
             }
         }
-
         stage("Action") {
             steps {
                 script {
@@ -40,6 +38,10 @@ pipeline {
                         case 'apply':
                             echo 'Executing Apply...'
                             sh "terraform apply --auto-approve"
+                            break
+                        case 'destroy':
+                            echo 'Executing Destroy...'
+                            sh "terraform destroy --auto-approve"
                             break
                         default:
                             error 'Unknown action'
